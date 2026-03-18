@@ -12,7 +12,7 @@ export const CodeDemo = ({ duration, delay, writing, cursor }) => {
   return (
     <Code
       key={`${duration}-${delay}-${writing}-${cursor}`}
-      className="w-110 h-120 border-none"
+      className="w-full sm:w-110 h-120 border-none"
       code={`import { useState, useEffect } from "react";
 
 const useFetch = (url, options) => {

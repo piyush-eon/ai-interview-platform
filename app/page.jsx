@@ -1,6 +1,6 @@
 import { CodeDemo } from "@/components/demo-components-animate-code";
 import { StarsBackgroundDemo } from "@/components/demo-components-backgrounds-stars";
-import { AI_TAGS, AVATARS, LOGOS, PLANS, ROLES, SLOTS } from "@/lib/data";
+import { AI_TAGS, AVATARS, LOGOS, ROLES, SLOTS } from "@/lib/data";
 import {
   GoldTitle,
   GrayTitle,
@@ -23,6 +23,7 @@ function MockUI({ rows = 3 }) {
     "bg-white/5",
     "bg-white/5",
   ];
+
   return (
     <div className="mt-5 rounded-xl bg-[#141417] border border-white/10 overflow-hidden">
       <div className="h-9 bg-white/5 border-b border-white/10 flex items-center px-3.5 gap-1.5">
@@ -45,16 +46,18 @@ function MockUI({ rows = 3 }) {
 function BentoCard({ icon, title, desc, children, className = "" }) {
   return (
     <div
-      className={`relative bg-[#0f0f11] border border-white/10 hover:border-amber-400/20 rounded-2xl p-9 h-full transition-all duration-300 hover:-translate-y-0.5 overflow-hidden ${className}`}
+      className={`relative bg-[#0f0f11] border border-white/10 hover:border-amber-400/20 rounded-2xl p-9 h-full transition duration-300 overflow-hidden ${className}`}
     >
-      <div className="absolute inset-0 bg-linear-to-br from-amber-400/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-br from-amber-400/5 via-transparent pointer-events-none" />
+
       <span className="w-11 h-11 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-xl mb-5">
         {icon}
       </span>
+
       <h3 className="font-serif text-xl tracking-tight mb-2">{title}</h3>
-      <p className="text-sm text-stone-400 font-light leading-relaxed">
-        {desc}
-      </p>
+
+      <p className="text-sm text-stone-400 leading-relaxed">{desc}</p>
+
       {children}
     </div>
   );
@@ -63,27 +66,27 @@ function BentoCard({ icon, title, desc, children, className = "" }) {
 export default function LandingPage() {
   return (
     <div className="bg-black overflow-x-hidden">
-      {/* ── HERO ── */}
-      <section className="relative min-h-screen grid grid-cols-1 lg:grid-cols-5 px-6 sm:px-8 pt-28 sm:pt-32 pb-20 overflow-hidden">
+      {/* HERO */}
+      <section className="relative min-h-screen grid lg:grid-cols-5 px-6 sm:px-8 pt-28 sm:pt-32 pb-20 overflow-hidden">
         <StarsBackgroundDemo />
 
-        {/* LEFT CONTENT */}
+        {/* LEFT */}
         <div className="col-span-full lg:col-span-3 flex flex-col items-center justify-center text-center lg:-rotate-2">
           <Badge variant="gold">Powered by AI — Now in Beta</Badge>
 
-          <h1 className="font-serif relative z-10 text-5xl sm:text-6xl lg:text-7xl tracking-tighter max-w-4xl">
+          <h1 className="font-serif relative text-5xl sm:text-6xl lg:text-7xl tracking-tighter max-w-4xl">
             <GrayTitle>Ace your next interview</GrayTitle>
             <br />
             <GoldTitle>with smart experts</GoldTitle>
           </h1>
 
-          <p className="relative z-10 text-sm sm:text-base md:text-lg text-stone-400 font-light max-w-xl mt-5 sm:mt-6 leading-relaxed">
+          <p className="relative text-sm sm:text-base md:text-lg text-stone-400 max-w-xl mt-6 leading-relaxed">
             Book 1:1 mock interviews with senior engineers from top companies.
             Get AI-powered feedback, role-specific questions, and the confidence
             to land your dream job.
           </p>
 
-          <div className="relative z-10 flex items-center justify-center gap-3 sm:gap-4 mt-8 sm:mt-10 w-full sm:w-auto">
+          <div className="relative flex justify-center gap-4 mt-10 sm:w-auto">
             <Link href="/onboarding">
               <Button variant="gold" size="hero">
                 Get started
@@ -97,23 +100,27 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-12 sm:mt-16">
+          <div className="relative flex items-center justify-center gap-4 mt-16">
             <div className="flex">
               {AVATARS.map((av, i) => (
                 <div
                   key={i}
-                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-[#0a0a0b] bg-linear-to-br ${
-                    av.c
-                  } flex items-center justify-center text-[10px] sm:text-xs font-semibold ${
+                  className={`w-8 h-8 rounded-full border-2 border-[#0a0a0b] overflow-hidden ${
                     i > 0 ? "-ml-2" : ""
                   }`}
                 >
-                  {av.i}
+                  <Image
+                    src={av.src}
+                    alt="user avatar"
+                    width={32}
+                    height={32}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               ))}
             </div>
 
-            <p className="text-xs sm:text-sm text-stone-500 text-center sm:text-left">
+            <p className="text-sm text-stone-500 text-center sm:text-left">
               <strong className="text-stone-400 font-medium">
                 2,400+ engineers
               </strong>{" "}
@@ -122,7 +129,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* RIGHT IMAGE */}
+        {/* RIGHT */}
         <div className="col-span-full lg:col-span-2 flex items-center justify-center lg:justify-start mt-12 lg:mt-0 lg:rotate-3">
           {/* <Image
             src="/hero.png"
@@ -137,30 +144,28 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── LOGOS ── */}
-      <section className="relative z-10 border-t border-b border-white/10 py-14">
+      {/* LOGOS */}
+      <section className="relative z-10 border-y border-white/10 py-14">
         <p className="text-center text-xs font-medium text-stone-600 tracking-widest uppercase mb-8">
           Interviewees landed roles at
         </p>
+
         <div className="flex flex-wrap items-center justify-center gap-24 px-6">
           {LOGOS.map((l) => (
             <Image
               key={l.alt}
               src={l.src}
               alt={l.alt}
-              width={24}
-              height={24}
+              width={50}
+              height={50}
               className="h-6 w-auto opacity-60 grayscale"
             />
           ))}
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section
-        id="Features"
-        className="relative z-10 py-28 max-w-5xl mx-auto px-6"
-      >
+      {/* FEATURES */}
+      <section className="relative z-10 py-28 max-w-5xl mx-auto px-6">
         <div className="text-center mb-16">
           <SectionLabel>Features</SectionLabel>
           <SectionHeading
@@ -192,7 +197,7 @@ export default function LandingPage() {
               title={<GrayTitle>Credit System</GrayTitle>}
               desc="Subscribe for monthly credits. Book sessions. Interviewers earn and withdraw any time."
             >
-              <div className="mt-5 rounded-xl bg-[#141417] border border-white/10 p-5 flex items-end justify-between">
+              <div className="mt-5 rounded-xl bg-[#141417] border border-white/10 p-5 flex justify-between items-end">
                 <div>
                   <p className="text-xs text-stone-600 mb-1">Your balance</p>
                   <p className="font-serif text-4xl leading-none bg-linear-to-br from-amber-300 to-amber-500 bg-clip-text text-transparent">
@@ -238,7 +243,7 @@ export default function LandingPage() {
             <BentoCard
               icon="📊"
               title={<GrayTitle>AI Feedback Reports</GrayTitle>}
-              desc="Post-interview analysis by Gemini. Covers communication, technical depth, problem-solving, and a clear hiring recommendation with action items."
+              desc="Post-interview analysis by Gemini with actionable insights."
             >
               <MockUI rows={5} />
             </BentoCard>
@@ -265,35 +270,36 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── ROLES ── */}
+      {/* ROLES */}
       <section className="relative z-10 pb-28 max-w-5xl mx-auto px-6">
         <div className="text-center mb-16">
           <SectionLabel>Who it&apos;s for</SectionLabel>
           <SectionHeading gray="Built for both sides" gold="of the table" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {ROLES.map((role) => (
             <div
               key={role.label}
-              className="relative bg-[#0f0f11] border border-white/10 hover:border-amber-400/20 rounded-2xl p-12 h-full transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+              className="relative bg-[#0f0f11] border border-white/10 hover:border-amber-400/20 rounded-2xl p-12 h-full transition duration-300 overflow-hidden"
             >
               <div className="absolute bottom-0 right-0 w-48 h-48 rounded-full bg-[radial-gradient(circle,rgba(251,191,36,0.05)_0%,transparent_70%)] pointer-events-none" />
+
               <span className="inline-block text-xs font-semibold text-amber-400 tracking-widest uppercase border border-amber-400/20 bg-amber-400/10 rounded-full px-3 py-1.5 mb-5">
                 {role.label}
               </span>
+
               <h3 className="font-serif text-2xl tracking-tight mb-4">
                 {role.title}
               </h3>
-              <p className="text-sm text-stone-400 font-light leading-relaxed mb-8">
+
+              <p className="text-sm text-stone-400 leading-relaxed mb-8">
                 {role.desc}
               </p>
+
               <ul className="space-y-3">
                 {role.perks.map((p) => (
-                  <li
-                    key={p}
-                    className="flex items-start gap-3 text-sm text-stone-400"
-                  >
+                  <li key={p} className="flex gap-3 text-sm text-stone-400">
                     <span className="mt-0.5 min-w-4 h-4 rounded-full bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-xs text-amber-400">
                       ✓
                     </span>
@@ -306,38 +312,40 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── PRICING ── */}
-      <section
-        id="Pricing"
-        className="relative z-10 pb-28 max-w-5xl mx-auto px-6"
-      >
+      {/* PRICING */}
+      <section className="relative z-10 pb-28 max-w-5xl mx-auto px-6">
         <div className="text-center mb-16">
           <SectionLabel>Pricing</SectionLabel>
           <SectionHeading
             gray="Simple, transparent"
             gold="credit-based plans"
           />
-          <p className="text-stone-400 font-light mt-3 text-sm">
-            Each credit = one session. Unused credits roll over. Cancel anytime.
+          <p className="text-stone-400 mt-3 text-sm">
+            Each credit = one session. Unused credits roll over.
           </p>
         </div>
+
         <PricingSection />
       </section>
 
-      {/* ── CTA ── */}
+      {/* CTA */}
       <section className="relative z-10 pb-28 max-w-5xl mx-auto px-6">
-        <div className="relative border border-amber-400/20 rounded-3xl px-16 py-20 bg-linear-to-br from-amber-400/5 to-transparent text-center overflow-hidden">
+        <div className="relative border border-amber-400/20 rounded-3xl px-16 py-20 bg-linear-to-br from-amber-400/5 text-center overflow-hidden">
           <StarsBackgroundDemo />
+
           <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-48 rounded-full bg-[radial-gradient(ellipse,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none" />
-          <h2 className="font-serif relative z-10 text-4xl md:text-5xl leading-tight tracking-tight mb-4">
+
+          <h2 className="font-serif relative text-4xl md:text-5xl leading-tight tracking-tight mb-4">
             <GrayTitle>Your next interview</GrayTitle>
             <br />
             <GoldTitle>starts here</GoldTitle>
           </h2>
-          <p className="relative z-10 text-stone-400 font-light text-sm mb-11">
+
+          <p className="relative text-stone-400 font-light text-sm mb-11">
             Join thousands of engineers already levelling up on Prept.
           </p>
-          <div className="relative z-10 flex flex-wrap justify-center gap-4">
+
+          <div className="relative flex flex-wrap justify-center gap-4">
             <Button variant="gold" size="hero">
               Get started free →
             </Button>

@@ -330,10 +330,8 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="relative z-10 pb-28 max-w-5xl mx-auto px-6">
-        <div className="relative border border-amber-400/20 rounded-3xl px-16 py-20 bg-linear-to-br from-amber-400/5 text-center overflow-hidden">
+        <div className="relative border border-amber-400/20 rounded-3xl px-3 sm:px-16 py-20 bg-linear-to-br from-amber-400/5 text-center overflow-hidden">
           <StarsBackgroundDemo />
-
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-48 rounded-full bg-[radial-gradient(ellipse,rgba(251,191,36,0.1)_0%,transparent_70%)] pointer-events-none" />
 
           <h2 className="font-serif relative text-4xl md:text-5xl leading-tight tracking-tight mb-4">
             <GrayTitle>Your next interview</GrayTitle>
@@ -345,14 +343,11 @@ export default function LandingPage() {
             Join thousands of engineers already levelling up on Prept.
           </p>
 
-          <div className="relative flex flex-wrap justify-center gap-4">
+          <Link href="/onboarding" className="relative">
             <Button variant="gold" size="hero">
-              Get started free →
+              Get started
             </Button>
-            <Button variant="outline" size="hero">
-              Become an interviewer
-            </Button>
-          </div>
+          </Link>
         </div>
       </section>
     </div>

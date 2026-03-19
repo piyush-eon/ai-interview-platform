@@ -67,7 +67,7 @@ export default function LandingPage() {
   return (
     <div className="bg-black overflow-x-hidden">
       {/* HERO */}
-      <section className="relative min-h-screen grid grid-cols-1 lg:grid-cols-5 px-3 sm:px-8 pt-28 sm:pt-32 pb-20 overflow-hidden">
+      <section className="relative min-h-screen grid grid-cols-1 lg:grid-cols-5 px-4 sm:px-8 pt-28 sm:pt-32 pb-20 overflow-hidden">
         <StarsBackgroundDemo />
 
         {/* LEFT */}
@@ -77,7 +77,7 @@ export default function LandingPage() {
           <h1 className="font-serif relative text-5xl sm:text-6xl lg:text-7xl tracking-tighter max-w-4xl">
             <GrayTitle>Ace your next interview</GrayTitle>
             <br />
-            <GoldTitle>with smart experts</GoldTitle>
+            <GoldTitle>with real experts</GoldTitle>
           </h1>
 
           <p className="relative text-sm sm:text-base md:text-lg text-stone-400 max-w-xl mt-6 leading-relaxed">

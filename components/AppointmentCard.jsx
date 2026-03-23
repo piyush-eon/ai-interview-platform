@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Video } from "lucide-react";
+import { Calendar, Clock, Video, Sparkles } from "lucide-react";
+import { FeedbackModal } from "./FeedbackModal";
 
 const STATUS_STYLES = {
   SCHEDULED: "border-blue-500/20 bg-blue-500/10 text-blue-400",
@@ -13,10 +15,10 @@ const STATUS_STYLES = {
 };
 
 const RATING_STYLES = {
-  POOR: "border-red-500/20 bg-red-500/10 text-red-400",
-  AVERAGE: "border-yellow-500/20 bg-yellow-500/10 text-yellow-400",
-  GOOD: "border-blue-500/20 bg-blue-500/10 text-blue-400",
-  EXCELLENT: "border-green-500/20 bg-green-500/10 text-green-400",
+  POOR: "ml-auto border-red-500/20 bg-red-500/10 text-red-400",
+  AVERAGE: "ml-auto border-yellow-500/20 bg-yellow-500/10 text-yellow-400",
+  GOOD: "ml-auto border-blue-500/20 bg-blue-500/10 text-blue-400",
+  EXCELLENT: "ml-auto border-green-500/20 bg-green-500/10 text-green-400",
 };
 
 const RATING_LABEL = {
@@ -50,9 +52,9 @@ function formatDuration(start, end) {
   return h > 0 ? `${h}h${m > 0 ? ` ${m}m` : ""}` : `${m}m`;
 }
 
-// mode="interviewer" → person is the interviewee they interviewed
-// mode="interviewee" → person is the interviewer they booked
 export function AppointmentCard({ booking, mode }) {
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+
   const {
     startTime,
     endTime,
@@ -79,9 +81,17 @@ export function AppointmentCard({ booking, mode }) {
   const isUpcoming = status === "SCHEDULED";
 
   return (
-    <article className="group relative bg-[#0f0f11] border border-white/10 transition-all duration-300 hover:-translate-y-0.5 rounded-2xl overflow-hidden  bg-linear-to-t from-transparent  via-transparent to-amber-300/10">
-      <div className="p-7 flex flex-col gap-6">
-        {/* ── Row 1: Person identity + status badges ── */}
+    <>
+      <FeedbackModal
+        open={feedbackOpen}
+        onOpenChange={setFeedbackOpen}
+        feedback={feedback}
+        intervieweeName={
+          mode === "interviewer" ? booking.interviewee?.name : undefined
+        }
+      />
+
+      <article className="group relative bg-[#0f0f11] border border-white/10 transition-all duration-300 hover:-translate-y-0.5 rounded-2xl bg-linear-to-t from-transparent via-transparent to-amber-300/10 p-7 flex flex-col gap-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4 min-w-0">
             <Avatar className="w-14 h-14 border border-white/10 rounded-2xl shrink-0">
@@ -135,10 +145,8 @@ export function AppointmentCard({ booking, mode }) {
           </div>
         </div>
 
-        {/* ── Divider ── */}
         <div className="h-px bg-white/5" />
 
-        {/* ── Row 2: Date + time + duration ── */}
         <div className="grid grid-cols-3 gap-4">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-1.5 text-stone-600">
@@ -177,7 +185,6 @@ export function AppointmentCard({ booking, mode }) {
           </div>
         </div>
 
-        {/* ── Row 3: AI Feedback summary snippet (if exists) ── */}
         {feedback?.summary && (
           <div className="rounded-xl border border-white/8 bg-[#141417] px-4 py-3 flex flex-col gap-1.5">
             <p className="text-[10px] font-semibold text-stone-600 tracking-widest uppercase">
@@ -189,7 +196,6 @@ export function AppointmentCard({ booking, mode }) {
           </div>
         )}
 
-        {/* ── Row 4: Action bar ── */}
         {(streamCallId || recordingUrl || feedback) && (
           <div className="flex items-center gap-2 flex-wrap pt-1">
             {streamCallId && isUpcoming && (
@@ -214,16 +220,27 @@ export function AppointmentCard({ booking, mode }) {
             )}
 
             {feedback && (
-              <Badge
-                variant="outline"
-                className={RATING_STYLES[feedback.overallRating]}
-              >
-                ✦ {RATING_LABEL[feedback.overallRating]} performance
-              </Badge>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 border-amber-400/20 text-amber-400 hover:bg-amber-400/10 hover:border-amber-400/40"
+                  onClick={() => setFeedbackOpen(true)}
+                >
+                  <Sparkles size={12} />
+                  Full Feedback
+                </Button>
+                <Badge
+                  variant="outline"
+                  className={RATING_STYLES[feedback.overallRating]}
+                >
+                  ✦ {RATING_LABEL[feedback.overallRating]} performance
+                </Badge>
+              </>
             )}
           </div>
         )}
-      </div>
-    </article>
+      </article>
+    </>
   );
 }

@@ -43,7 +43,7 @@ function MockUI({ rows = 3 }) {
   );
 }
 
-function BentoCard({ icon, title, desc, children, className = "" }) {
+export function BentoCard({ icon, title, desc, children, className = "" }) {
   return (
     <div
       className={`relative bg-[#0f0f11] border border-white/10 hover:border-amber-400/20 rounded-2xl p-9 h-full transition duration-300 overflow-hidden ${className}`}

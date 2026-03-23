@@ -71,7 +71,7 @@ export const getInterviewerAppointments = async () => {
     where: { interviewerId: dbUser.id },
     include: {
       interviewee: { select: { name: true, imageUrl: true, email: true } },
-      feedback: { select: { overallRating: true, summary: true } },
+      feedback: true,
     },
     orderBy: { startTime: "desc" },
   });

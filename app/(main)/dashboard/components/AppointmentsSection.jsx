@@ -41,9 +41,11 @@ export default function AppointmentsSection({ appointments }) {
               <p className="text-xs font-semibold text-stone-500 tracking-widest uppercase">
                 Upcoming ({scheduled.length})
               </p>
-              {scheduled.map((b) => (
-                <AppointmentCard key={b.id} booking={b} mode="interviewer" />
-              ))}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {scheduled.map((b) => (
+                  <AppointmentCard key={b.id} booking={b} mode="interviewer" />
+                ))}
+              </div>
             </div>
           )}
 
@@ -52,9 +54,11 @@ export default function AppointmentsSection({ appointments }) {
               <p className="text-xs font-semibold text-stone-500 tracking-widest uppercase">
                 Past ({past.length})
               </p>
-              {past.map((b) => (
-                <AppointmentCard key={b.id} booking={b} mode="interviewer" />
-              ))}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {past.map((b) => (
+                  <AppointmentCard key={b.id} booking={b} mode="interviewer" />
+                ))}
+              </div>
             </div>
           )}
         </div>

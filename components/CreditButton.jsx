@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Coins } from "lucide-react";
 import UpgradeModal from "./UpgradeModal";
 import { Button } from "./ui/button";
-import Link from "next/link";
 
 export default function CreditButton({ role, credits }) {
   const [open, setOpen] = useState(false);

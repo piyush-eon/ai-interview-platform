@@ -9,41 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { completeOnboarding } from "@/actions/onboarding";
 import useFetch from "@/hooks/use-fetch";
-
-const CATEGORIES = [
-  { value: "FRONTEND", label: "Frontend" },
-  { value: "BACKEND", label: "Backend" },
-  { value: "FULLSTACK", label: "Full Stack" },
-  { value: "DSA", label: "DSA" },
-  { value: "SYSTEM_DESIGN", label: "System Design" },
-  { value: "BEHAVIORAL", label: "Behavioral" },
-  { value: "DEVOPS", label: "DevOps" },
-  { value: "MOBILE", label: "Mobile" },
-];
-
-const YEARS_OPTIONS = [
-  { value: 1, label: "1 yr" },
-  { value: 2, label: "2 yrs" },
-  { value: 3, label: "3 yrs" },
-  { value: 5, label: "5 yrs" },
-  { value: 7, label: "7 yrs" },
-  { value: 10, label: "10+ yrs" },
-];
-
-const ROLES = [
-  {
-    value: "INTERVIEWEE",
-    icon: "🎯",
-    title: "I want to practice",
-    desc: "Browse expert interviewers, book sessions, and get AI-powered feedback to land your dream role.",
-  },
-  {
-    value: "INTERVIEWER",
-    icon: "🧑‍💼",
-    title: "I want to interview",
-    desc: "Share your expertise, earn credits, and help engineers level up.",
-  },
-];
+import { CATEGORIES, ONBOARDING_ROLES, YEARS_OPTIONS } from "@/lib/data";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -121,7 +87,7 @@ export default function OnboardingPage() {
 
         {!role && (
           <div className="grid grid-cols-2 gap-4 w-full">
-            {ROLES.map((r) => (
+            {ONBOARDING_ROLES.map((r) => (
               <button
                 key={r.value}
                 type="button"
@@ -148,11 +114,11 @@ export default function OnboardingPage() {
             <div className="flex items-center justify-between bg-[#0f0f11] border border-white/10 rounded-2xl px-6 py-4">
               <div className="flex items-center gap-3">
                 <span className="w-9 h-9 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-base shrink-0">
-                  {ROLES.find((r) => r.value === role)?.icon}
+                  {ONBOARDING_ROLES.find((r) => r.value === role)?.icon}
                 </span>
                 <div>
                   <p className="text-sm font-medium text-stone-200">
-                    {ROLES.find((r) => r.value === role)?.title}
+                    {ONBOARDING_ROLES.find((r) => r.value === role)?.title}
                   </p>
                   <p className="text-xs text-stone-600 mt-0.5">Selected role</p>
                 </div>
@@ -215,7 +181,10 @@ export default function OnboardingPage() {
                 {/* categories */}
                 <div className="flex flex-wrap gap-2">
                   {CATEGORIES.map((cat) => {
+                    if (!cat?.value) return null;
+
                     const active = form.categories.includes(cat.value);
+
                     return (
                       <button
                         key={cat.value}

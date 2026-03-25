@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { GrayTitle, SectionLabel } from "@/components/reusables";
 import SlotPicker from "./_components/SlotPicker";
 import { StarsBackgroundDemo } from "@/components/demo-components-backgrounds-stars";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const CATEGORY_LABEL = {
   FRONTEND: "Frontend",
@@ -58,18 +61,22 @@ export default async function InterviewerProfilePage({ params }) {
   if (dbUser.role === "UNASSIGNED") redirect("/onboarding");
 
   const interviewer = await getInterviewerProfile(id);
+
   if (!interviewer) notFound();
 
   return (
     <main className="min-h-screen bg-black">
       {/* ── Hero identity banner ── */}
       <section className="relative border-b border-white/8 overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <StarsBackgroundDemo />
-        </div>
+        <StarsBackgroundDemo />
 
-        <div className="max-w-6xl mx-auto px-8 pt-20 pb-14 flex flex-col gap-8">
-          <SectionLabel>Interviewer profile</SectionLabel>
+        <div className="relative max-w-6xl mx-auto px-8 pt-20 pb-14 flex flex-col gap-8">
+          <Link href="/explore">
+            <Button variant="link" className="text-stone-500 cursor-pointer">
+              <ArrowLeft size={13} />
+              Back to explore
+            </Button>
+          </Link>
 
           <div className="flex items-start gap-8">
             <Avatar className="w-24 h-24 border-2 border-white/10 shrink-0 rounded-2xl">

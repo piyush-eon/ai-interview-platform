@@ -3,19 +3,28 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { request } from "@arcjet/next";
+import { createRateLimiter, checkRateLimit } from "@/lib/arcjet";
+
+// 3 withdrawal attempts per hour — a real user submits once and waits
+const withdrawalLimiter = createRateLimiter({
+  refillRate: 1,
+  interval: "1h",
+  capacity: 3,
+});
 
 // ─── AVAILABILITY ─────────────────────────────────────────────────────────────
 
 export const setAvailability = async ({ startTime, endTime }) => {
   const user = await currentUser();
-  if (!user) return { error: "Unauthorized" };
+  if (!user) throw new Error("Unauthorized");
 
   const dbUser = await db.user.findUnique({ where: { clerkUserId: user.id } });
-  if (!dbUser || dbUser.role !== "INTERVIEWER") return { error: "Forbidden" };
+  if (!dbUser || dbUser.role !== "INTERVIEWER") throw new Error("Forbidden");
 
-  if (!startTime || !endTime) return { error: "Start and end time required" };
+  if (!startTime || !endTime) throw new Error("Start and end time required");
   if (new Date(startTime) >= new Date(endTime))
-    return { error: "Start time must be before end time" };
+    throw new Error("Start time must be before end time");
 
   try {
     const existing = await db.availability.findFirst({
@@ -42,16 +51,16 @@ export const setAvailability = async ({ startTime, endTime }) => {
     return { success: true };
   } catch (err) {
     console.error(err);
-    return { error: "Failed to save availability" };
+    throw new Error("Failed to save availability");
   }
 };
 
 export const getAvailability = async () => {
   const user = await currentUser();
-  if (!user) return null;
+  if (!user) throw new Error("Unauthorized");
 
   const dbUser = await db.user.findUnique({ where: { clerkUserId: user.id } });
-  if (!dbUser) return null;
+  if (!dbUser) throw new Error("User not found");
 
   return db.availability.findFirst({
     where: { interviewerId: dbUser.id, status: "AVAILABLE" },
@@ -62,10 +71,10 @@ export const getAvailability = async () => {
 
 export const getInterviewerAppointments = async () => {
   const user = await currentUser();
-  if (!user) return [];
+  if (!user) throw new Error("Unauthorized");
 
   const dbUser = await db.user.findUnique({ where: { clerkUserId: user.id } });
-  if (!dbUser) return [];
+  if (!dbUser) throw new Error("User not found");
 
   return db.booking.findMany({
     where: { interviewerId: dbUser.id },
@@ -81,7 +90,7 @@ export const getInterviewerAppointments = async () => {
 
 export const getInterviewerStats = async () => {
   const user = await currentUser();
-  if (!user) return null;
+  if (!user) throw new Error("Unauthorized");
 
   const dbUser = await db.user.findUnique({
     where: { clerkUserId: user.id },
@@ -94,7 +103,7 @@ export const getInterviewerStats = async () => {
       },
     },
   });
-  if (!dbUser) return null;
+  if (!dbUser) throw new Error("User not found");
 
   const totalEarned = dbUser.bookingsAsInterviewer.reduce(
     (sum, b) => sum + b.creditsCharged,
@@ -115,16 +124,22 @@ export const requestWithdrawal = async ({
   paymentDetail,
 }) => {
   const user = await currentUser();
-  if (!user) return { error: "Unauthorized" };
+  if (!user) throw new Error("Unauthorized");
+
+  // ── Arcjet rate limit ──────────────────────────────────────────────────────
+  const req = await request();
+  const rateLimitError = await checkRateLimit(withdrawalLimiter, req, user.id);
+  if (rateLimitError) throw new Error(rateLimitError);
+  // ──────────────────────────────────────────────────────────────────────────
 
   const dbUser = await db.user.findUnique({ where: { clerkUserId: user.id } });
-  if (!dbUser || dbUser.role !== "INTERVIEWER") return { error: "Forbidden" };
+  if (!dbUser || dbUser.role !== "INTERVIEWER") throw new Error("Forbidden");
 
-  if (!credits || credits <= 0) return { error: "Invalid credit amount" };
+  if (!credits || credits <= 0) throw new Error("Invalid credit amount");
   if (credits > dbUser.creditBalance)
-    return { error: "Insufficient credit balance" };
+    throw new Error("Insufficient credit balance");
   if (!paymentMethod || !paymentDetail)
-    return { error: "Payment details required" };
+    throw new Error("Payment details required");
 
   const PLATFORM_FEE = 0.2;
   const netAmount = credits * (1 - PLATFORM_FEE);
@@ -155,16 +170,16 @@ export const requestWithdrawal = async ({
     return { success: true, netAmount };
   } catch (err) {
     console.error(err);
-    return { error: "Withdrawal request failed" };
+    throw new Error("Withdrawal request failed");
   }
 };
 
 export const getWithdrawalHistory = async () => {
   const user = await currentUser();
-  if (!user) return [];
+  if (!user) throw new Error("Unauthorized");
 
   const dbUser = await db.user.findUnique({ where: { clerkUserId: user.id } });
-  if (!dbUser) return [];
+  if (!dbUser) throw new Error("User not found");
 
   return db.payout.findMany({
     where: { interviewerId: dbUser.id },

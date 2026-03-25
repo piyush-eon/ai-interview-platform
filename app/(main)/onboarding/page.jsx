@@ -26,8 +26,8 @@ export default function OnboardingPage() {
   });
 
   useEffect(() => {
-    if (data && !data.error) {
-      router.push("/dashboard");
+    if (data && !loading) {
+      router.push(role === "INTERVIEWER" ? "/dashboard" : "/explore");
     }
   }, [data, router]);
 

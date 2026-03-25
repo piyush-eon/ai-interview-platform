@@ -4,6 +4,16 @@ import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { StreamClient } from "@stream-io/node-sdk";
 import { revalidatePath } from "next/cache";
+import { request } from "@arcjet/next";
+import { createRateLimiter, checkRateLimit } from "@/lib/arcjet";
+
+// 5 booking attempts per hour — generous enough for real users,
+// tight enough to block automated abuse
+const bookingLimiter = createRateLimiter({
+  refillRate: 2,
+  interval: "1h",
+  capacity: 5,
+});
 
 export const getInterviewerProfile = async (interviewerId) => {
   try {
@@ -42,6 +52,12 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
   const user = await currentUser();
   if (!user) return { error: "Unauthorized" };
 
+  // ── Arcjet rate limit ──────────────────────────────────────────────────────
+  const req = await request();
+  const rateLimitError = await checkRateLimit(bookingLimiter, req, user.id);
+  if (rateLimitError) return { error: rateLimitError };
+  // ──────────────────────────────────────────────────────────────────────────
+
   const [dbUser, interviewer] = await Promise.all([
     db.user.findUnique({ where: { clerkUserId: user.id } }),
     db.user.findUnique({ where: { id: interviewerId } }),
@@ -69,7 +85,7 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
   if (conflict)
     return { error: "This slot was just booked. Please pick another." };
 
-  // Create Stream call
+  // ── Create Stream call ─────────────────────────────────────────────────────
   let streamCallId;
   try {
     const streamClient = new StreamClient(
@@ -77,7 +93,6 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
       process.env.STREAM_SECRET_KEY
     );
 
-    // Stream requires users to exist before being added to a call
     await streamClient.upsertUsers([
       {
         id: dbUser.clerkUserId,

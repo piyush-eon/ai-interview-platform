@@ -1,6 +1,6 @@
+import arcjet, { detectBot, shield } from "@arcjet/next";
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-// import arcjet, { shield, detectBot } from "@arcjet/next";
 
 const isProtectedRoute = createRouteMatcher([
   "/appointments(.*)",
@@ -10,32 +10,32 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 // Arcjet global protection
-// const aj = arcjet({
-//   key: process.env.ARCJET_KEY,
-//   rules: [
-//     // Shield WAF - protects against SQL injection, XSS, etc.
-//     shield({
-//       mode: "LIVE", // Change to "DRY_RUN" to test without blocking
-//     }),
+const aj = arcjet({
+  key: process.env.ARCJET_KEY,
+  rules: [
+    // Shield WAF - protects against SQL injection, XSS, etc.
+    shield({
+      mode: "LIVE", // Change to "DRY_RUN" to test without blocking
+    }),
 
-//     // Bot detection - allow search engines, block malicious bots
-//     detectBot({
-//       mode: "LIVE",
-//       allow: [
-//         "CATEGORY:SEARCH_ENGINE", // Google, Bing, etc.
-//         "CATEGORY:PREVIEW", // Link previews (Slack, Discord, etc.)
-//       ],
-//     }),
-//   ],
-// });
+    // Bot detection - allow search engines, block malicious bots
+    detectBot({
+      mode: "LIVE",
+      allow: [
+        "CATEGORY:SEARCH_ENGINE", // Google, Bing, etc.
+        "CATEGORY:PREVIEW", // Link previews (Slack, Discord, etc.)
+      ],
+    }),
+  ],
+});
 
 export default clerkMiddleware(async (auth, req) => {
-  // // Apply Arcjet protection FIRST (before Clerk auth check)
-  // const decision = await aj.protect(req);
+  // Apply Arcjet protection FIRST (before Clerk auth check)
+  const decision = await aj.protect(req);
 
-  // if (decision.isDenied()) {
-  //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  // }
+  if (decision.isDenied()) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   // Then apply Clerk authentication
   const { userId } = await auth();

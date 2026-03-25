@@ -4,6 +4,7 @@ import Header from "@/components/header";
 import { DM_Sans, Lora } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { Toaster } from "sonner";
 
 const lora = Lora({
   subsets: ["latin"],
@@ -41,6 +42,8 @@ export default function RootLayout({ children }) {
           >
             <Header />
             <main className="min-h-screen">{children}</main>
+            <Toaster richColors />
+
             <footer className="relative z-10 border-t border-white/7 py-12  mx-auto px-6 flex flex-wrap items-center justify-center text-stone-400">
               Made with ❤️ by RoadsideCoder
             </footer>

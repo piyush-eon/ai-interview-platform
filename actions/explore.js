@@ -1,11 +1,19 @@
 "use server";
 
+import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 
 export const getInterviewers = async () => {
+  const user = await currentUser();
+
   try {
     const interviewers = await db.user.findMany({
-      where: { role: "INTERVIEWER" },
+      where: {
+        role: "INTERVIEWER",
+        // Exclude the logged-in user so an interviewer
+        // browsing explore doesn't see themselves
+        ...(user && { clerkUserId: { not: user.id } }),
+      },
       select: {
         id: true,
         name: true,

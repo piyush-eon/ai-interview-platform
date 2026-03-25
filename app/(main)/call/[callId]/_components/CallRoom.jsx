@@ -30,7 +30,6 @@ import "stream-chat-react/dist/css/v2/index.css";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { GrayTitle } from "@/components/reusables";
 import { MessageSquare, Sparkles, Loader2 } from "lucide-react";
 
 // ─── AI Question Generator ────────────────────────────────────────────────────

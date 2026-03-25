@@ -7,89 +7,17 @@ import { Separator } from "@/components/ui/separator";
 import { GrayTitle } from "@/components/reusables";
 import { bookSlot } from "@/actions/booking";
 import useFetch from "@/hooks/use-fetch";
-import PricingSection from "@/components/PricingSection";
 import UpgradeModal from "@/components/UpgradeModal";
-import { formatDateFull, formatTime } from "@/lib/helpers";
+import {
+  formatDateFull,
+  formatTime,
+  formatDateTab,
+  generateDates,
+  generateSlots,
+} from "@/lib/helpers";
 
 const SLOT_DURATION_MINUTES = 45;
 const DAYS_AHEAD = 7;
-
-function generateDates() {
-  return Array.from({ length: DAYS_AHEAD }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    return d;
-  });
-}
-
-function generateSlots(date, availStartTime, availEndTime, bookedSlots) {
-  const avStart = new Date(availStartTime);
-  const avEnd = new Date(availEndTime);
-
-  const start = new Date(date);
-  start.setHours(avStart.getHours(), avStart.getMinutes(), 0, 0);
-
-  const end = new Date(date);
-  end.setHours(avEnd.getHours(), avEnd.getMinutes(), 0, 0);
-
-  const now = new Date();
-  const slots = [];
-  let cursor = new Date(start);
-
-  while (cursor < end) {
-    const slotEnd = new Date(cursor.getTime() + SLOT_DURATION_MINUTES * 60000);
-    if (slotEnd > end) break;
-
-    const isPast = cursor <= now;
-    const isBooked = bookedSlots.some((b) => {
-      const bs = new Date(b.startTime);
-      const be = new Date(b.endTime);
-      return cursor < be && slotEnd > bs;
-    });
-
-    if (!isPast) {
-      slots.push({
-        startTime: new Date(cursor),
-        endTime: slotEnd,
-        isBooked,
-        available: !isBooked,
-      });
-    }
-    cursor = new Date(slotEnd);
-  }
-
-  return slots;
-}
-
-function formatDateTab(date) {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-
-  if (date.toDateString() === today.toDateString())
-    return {
-      top: "Today",
-      bottom: date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
-    };
-  if (date.toDateString() === tomorrow.toDateString())
-    return {
-      top: "Tomorrow",
-      bottom: date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      }),
-    };
-  return {
-    top: date.toLocaleDateString("en-US", { weekday: "short" }),
-    bottom: date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    }),
-  };
-}
 
 export default function SlotPicker({
   interviewer,
@@ -97,7 +25,7 @@ export default function SlotPicker({
   userCredits,
 }) {
   const router = useRouter();
-  const dates = useMemo(() => generateDates(), []);
+  const dates = useMemo(() => generateDates(DAYS_AHEAD), []);
   const [selectedDate, setSelectedDate] = useState(dates[0]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
@@ -113,7 +41,8 @@ export default function SlotPicker({
       selectedDate,
       availability.startTime,
       availability.endTime,
-      interviewer.bookingsAsInterviewer ?? []
+      interviewer.bookingsAsInterviewer ?? [],
+      SLOT_DURATION_MINUTES
     );
   }, [selectedDate, availability, interviewer.bookingsAsInterviewer]);
 
@@ -130,13 +59,10 @@ export default function SlotPicker({
 
   const handleSlotClick = (slot) => {
     if (!slot.available) return;
-
-    // Gate: open upgrade modal instead of silently blocking
     if (!canAfford) {
       setUpgradeOpen(true);
       return;
     }
-
     setSelectedSlot((prev) =>
       prev?.startTime.getTime() === slot.startTime.getTime() ? null : slot
     );
@@ -163,7 +89,6 @@ export default function SlotPicker({
 
   return (
     <>
-      {/* Upgrade modal — PricingSection is a server component, slots in as children */}
       <UpgradeModal
         open={upgradeOpen}
         onOpenChange={setUpgradeOpen}
@@ -237,14 +162,12 @@ export default function SlotPicker({
                 const isSelected =
                   selectedSlot?.startTime.getTime() ===
                   slot.startTime.getTime();
-                const hardUnavailable = slot.isBooked || slot.isPast;
 
                 return (
                   <button
                     key={slot.startTime.toISOString()}
                     type="button"
-                    // Only hard-disable booked/past — not-canAfford slots stay clickable to open modal
-                    disabled={hardUnavailable}
+                    disabled={slot.isBooked}
                     onClick={() => handleSlotClick(slot)}
                     className={`relative text-xs px-2 py-2.5 rounded-xl border transition-all duration-200 ${
                       isSelected

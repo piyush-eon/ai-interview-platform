@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -29,6 +29,17 @@ export default function SlotPicker({
   const [selectedDate, setSelectedDate] = useState(dates[0]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+
+  const summaryRef = useRef(null);
+
+  useEffect(() => {
+    if (selectedSlot && summaryRef.current) {
+      summaryRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [selectedSlot]);
 
   const { data, loading, error, fn: bookFn } = useFetch(bookSlot);
 
@@ -195,7 +206,10 @@ export default function SlotPicker({
 
         {/* ── Inline confirm card ── */}
         {selectedSlot && (
-          <div className="bg-[#0f0f11] border border-amber-400/20 rounded-2xl p-6 flex flex-col gap-4">
+          <div
+            ref={summaryRef}
+            className="bg-[#0f0f11] border border-amber-400/20 rounded-2xl p-6 flex flex-col gap-4"
+          >
             <p className="text-xs font-semibold text-stone-500 tracking-widest uppercase">
               Your booking
             </p>

@@ -145,8 +145,8 @@ export const requestWithdrawal = async ({
     throw new Error("Payment details required");
 
   const PLATFORM_FEE = 0.2;
-  const netAmount = credits * (1 - PLATFORM_FEE);
-  const platformFee = credits * PLATFORM_FEE;
+  const netAmount = credits * (1 - PLATFORM_FEE) * 5;
+  const platformFee = credits * PLATFORM_FEE * 5;
 
   try {
     const [payout] = await db.$transaction([

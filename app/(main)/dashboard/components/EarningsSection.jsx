@@ -42,7 +42,8 @@ export default function EarningsSection({ stats, history }) {
 
   const { data, loading, error, fn: withdrawFn } = useFetch(requestWithdrawal);
 
-  const balance = stats?.creditBalance ?? 0;
+  const balance = (stats?.creditBalance ?? 0) * 5;
+  const totalEarnedDollars = (stats?.totalEarned ?? 0) * 5;
   const feeAmount = (balance * PLATFORM_FEE).toFixed(2);
   const netAmount = (balance * (1 - PLATFORM_FEE)).toFixed(2);
   const selectedMethod = PAYMENT_METHODS.find((m) => m.value === method);
@@ -79,10 +80,11 @@ export default function EarningsSection({ stats, history }) {
         {[
           {
             label: "Credit balance",
-            value: balance,
+            value: stats?.creditBalance ?? 0,
             unit: "credits",
             gold: true,
             icon: <Wallet size={16} className="text-amber-400" />,
+            dollarValue: balance,
           },
           {
             label: "Total earned",
@@ -90,6 +92,7 @@ export default function EarningsSection({ stats, history }) {
             unit: "credits",
             gold: false,
             icon: <TrendingUp size={16} className="text-stone-400" />,
+            dollarValue: totalEarnedDollars,
           },
           {
             label: "Sessions done",
@@ -114,7 +117,13 @@ export default function EarningsSection({ stats, history }) {
               {stat.value}
             </p>
             <p className="text-xs text-stone-600">{stat.unit}</p>
-            <p className="text-xs text-stone-500">{stat.label}</p>
+
+            <p className="text-xs text-stone-500">
+              {stat.label}{" "}
+              {stat.dollarValue !== undefined
+                ? `($${stat?.dollarValue?.toFixed(2)})`
+                : ""}
+            </p>
           </div>
         ))}
       </div>
@@ -209,8 +218,8 @@ export default function EarningsSection({ stats, history }) {
                 {/* Fee breakdown */}
                 <div className="rounded-xl bg-[#141417] border border-white/8 p-4 flex flex-col gap-2">
                   <div className="flex justify-between text-xs text-stone-500">
-                    <span>Credits</span>
-                    <span className="text-stone-300">{balance}</span>
+                    <span>Balance (1 Cr = $5)</span>
+                    <span className="text-green-400">${balance}</span>
                   </div>
                   <div className="flex justify-between text-xs text-stone-500">
                     <span>Platform fee (20%)</span>
@@ -282,7 +291,7 @@ export default function EarningsSection({ stats, history }) {
                   disabled={!isValid || loading}
                   onClick={() =>
                     withdrawFn({
-                      credits: balance,
+                      credits: stats?.creditBalance,
                       paymentMethod: method,
                       paymentDetail: detail,
                     })

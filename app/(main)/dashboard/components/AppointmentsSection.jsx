@@ -56,7 +56,12 @@ export default function AppointmentsSection({ appointments }) {
               </p>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                 {past.map((b) => (
-                  <AppointmentCard key={b.id} booking={b} mode="interviewer" />
+                  <AppointmentCard
+                    key={b.id}
+                    booking={b}
+                    mode="interviewer"
+                    isPast
+                  />
                 ))}
               </div>
             </div>

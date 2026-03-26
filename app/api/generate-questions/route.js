@@ -1,4 +1,3 @@
-// app/api/generate-questions/route.js
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { auth } from "@clerk/nextjs/server";
 

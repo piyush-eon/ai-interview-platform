@@ -11,15 +11,6 @@ export default async function MyAppointmentsPage() {
   const user = await currentUser();
   if (!user) redirect("/");
 
-  // const dbUser = await db.user.findUnique({
-  //   where: { clerkUserId: user.id },
-  //   select: { role: true, credits: true },
-  // });
-
-  // if (!dbUser) redirect("/");
-  // if (dbUser.role === "UNASSIGNED") redirect("/onboarding");
-  // if (dbUser.role === "INTERVIEWER") redirect("/dashboard");
-
   const appointments = await getIntervieweeAppointments();
   const now = new Date();
   const scheduled = appointments.filter(
@@ -88,7 +79,12 @@ export default async function MyAppointmentsPage() {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {past.map((b) => (
-                <AppointmentCard key={b.id} booking={b} mode="interviewee" />
+                <AppointmentCard
+                  key={b.id}
+                  booking={b}
+                  mode="interviewee"
+                  isPast={true}
+                />
               ))}
             </div>
           </div>

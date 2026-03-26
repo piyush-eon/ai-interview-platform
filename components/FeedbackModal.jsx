@@ -31,7 +31,7 @@ export function FeedbackModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-black border border-white/10 text-stone-100 max-w-4xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="bg-black border border-amber-200/20 text-stone-100 sm:max-w-3xl max-h-[85vh] overflow-y-auto">
         <StarsBackgroundDemo />
 
         <DialogHeader className="relative">
@@ -129,7 +129,7 @@ export function FeedbackModal({
                   <Badge
                     key={i}
                     variant="outline"
-                    className="justify-start border-green-500/20 text-green-400"
+                    className="justify-start border-green-500/20 text-green-400 whitespace-normal"
                   >
                     ✓ {s}
                   </Badge>
@@ -145,9 +145,15 @@ export function FeedbackModal({
                 </p>
               </div>
 
-              <div className="flex flex-col text-sm">
-                {["grs", "rfg"]?.map((imp, i) => (
-                  <span key={i}>→ {imp}</span>
+              <div className="flex flex-col gap-2">
+                {feedback.improvements?.map((imp, i) => (
+                  <Badge
+                    key={i}
+                    variant="outline"
+                    className="justify-start border-red-500/20 text-red-400 whitespace-normal"
+                  >
+                    ✓ {imp}
+                  </Badge>
                 ))}
               </div>
             </div>

@@ -10,7 +10,7 @@ import { FeedbackModal } from "./FeedbackModal";
 import { formatDate, formatDuration, formatTime } from "@/lib/helpers";
 import { RATING_LABEL, RATING_STYLES, STATUS_STYLES } from "@/lib/data";
 
-export function AppointmentCard({ booking, mode }) {
+export function AppointmentCard({ booking, mode, isPast = false }) {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const {
@@ -156,7 +156,7 @@ export function AppointmentCard({ booking, mode }) {
 
         {(streamCallId || recordingUrl || feedback) && (
           <div className="flex items-center gap-2 flex-wrap pt-1">
-            {streamCallId && isUpcoming && (
+            {!isPast && streamCallId && isUpcoming && (
               <Button variant="gold" size="sm" className="gap-2" asChild>
                 <Link href={`/call/${streamCallId}`}>
                   <Video size={13} />

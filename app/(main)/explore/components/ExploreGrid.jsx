@@ -53,7 +53,7 @@ export default function ExploreGrid({ interviewers }) {
                 key={String(cat.value)}
                 type="button"
                 onClick={() => setActiveCategory(cat.value)}
-                className={`text-xs px-4 py-2 rounded-lg border transition-all duration-200 ${
+                className={`cursor-pointer text-xs px-4 py-2 rounded-lg border transition-all duration-200 ${
                   active
                     ? "border-amber-400/40 bg-amber-400/10 text-amber-400"
                     : "border-white/10 text-stone-500 hover:border-white/20 hover:text-stone-400"

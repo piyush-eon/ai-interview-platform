@@ -7,8 +7,6 @@ import { revalidatePath } from "next/cache";
 import { request } from "@arcjet/next";
 import { createRateLimiter, checkRateLimit } from "@/lib/arcjet";
 
-// 5 booking attempts per hour — generous enough for real users,
-// tight enough to block automated abuse
 const bookingLimiter = createRateLimiter({
   refillRate: 2,
   interval: "1h",
@@ -52,11 +50,9 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
   const user = await currentUser();
   if (!user) throw new Error("Unauthorized");
 
-  // ── Arcjet rate limit ──────────────────────────────────────────────────────
   const req = await request();
   const rateLimitError = await checkRateLimit(bookingLimiter, req, user.id);
   if (rateLimitError) throw new Error(rateLimitError);
-  // ──────────────────────────────────────────────────────────────────────────
 
   const [dbUser, interviewer] = await Promise.all([
     db.user.findUnique({ where: { clerkUserId: user.id } }),
@@ -70,10 +66,16 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
 
   const credits = interviewer.creditRate ?? 10;
 
-  if (dbUser.credits < credits)
+  if (dbUser.credits == 0)
     throw new Error("Insufficient credits. Please upgrade your plan.");
 
-  // Check slot isn't already taken
+  console.log(
+    "Booking slot for user:",
+    dbUser.email,
+    "credits:",
+    dbUser.credits
+  );
+
   const conflict = await db.booking.findFirst({
     where: {
       interviewerId,
@@ -82,38 +84,31 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
       endTime: { gt: new Date(startTime) },
     },
   });
+
   if (conflict)
     throw new Error("This slot was just booked. Please pick another.");
-
-  // ── Create Stream call ─────────────────────────────────────────────────────
   let streamCallId;
+
   try {
     const streamClient = new StreamClient(
       process.env.NEXT_PUBLIC_STREAM_API_KEY,
       process.env.STREAM_SECRET_KEY
     );
-
     await streamClient.upsertUsers([
       {
         id: dbUser.clerkUserId,
         name: dbUser.name ?? "Interviewee",
-        image: dbUser.imageUrl ?? undefined,
         role: "user",
       },
       {
         id: interviewer.clerkUserId,
         name: interviewer.name ?? "Interviewer",
-        image: interviewer.imageUrl ?? undefined,
         role: "user",
       },
     ]);
 
-    streamCallId = `mock_${Date.now()}_${Math.random()
-      .toString(36)
-      .slice(2, 7)}`;
-
+    streamCallId = `mock_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const call = streamClient.video.call("default", streamCallId);
-
     await call.getOrCreate({
       data: {
         created_by_id: dbUser.clerkUserId,
@@ -121,16 +116,6 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
           { user_id: dbUser.clerkUserId, role: "host" },
           { user_id: interviewer.clerkUserId, role: "host" },
         ],
-        settings_override: {
-          recording: { mode: "available", quality: "1080p" },
-          screensharing: {
-            enabled: true,
-            // target_resolution: { width: 1920, height: 1080 },
-          },
-          transcription: {
-            mode: "auto-on", // starts when first user joins, stops when all leave
-          },
-        },
       },
     });
   } catch (err) {
@@ -163,8 +148,9 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
 
       await tx.user.update({
         where: { id: dbUser.id },
-        data: { credits: { decrement: credits } },
+        data: { credits: { decrement: 1 } },
       });
+
       await tx.user.update({
         where: { id: interviewerId },
         data: { creditBalance: { increment: credits } },
@@ -172,10 +158,12 @@ export const bookSlot = async ({ interviewerId, startTime, endTime }) => {
 
       return newBooking;
     });
-
     revalidatePath(`/interviewers/${interviewerId}`);
+    db.booking.update({
+      where: { id: booking.id },
+      data: { status: "SCHEDULED" },
+    });
     revalidatePath("/dashboard");
-
     return { success: true, bookingId: booking.id, streamCallId };
   } catch (err) {
     console.error("bookSlot transaction failed:", err);

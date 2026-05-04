@@ -30,11 +30,11 @@ export default function SlotPicker({
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 
-  const confirmRef = useRef(null);
+  const summaryRef = useRef(null);
 
   useEffect(() => {
-    if (selectedSlot && confirmRef.current) {
-      confirmRef.current.scrollIntoView({
+    if (selectedSlot && summaryRef.current) {
+      summaryRef.current.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
@@ -184,8 +184,8 @@ export default function SlotPicker({
                       isSelected
                         ? "border-amber-400/60 bg-amber-400/15 text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.08)]"
                         : slot.isBooked
-                          ? "border-white/5 bg-white/2 text-stone-700 cursor-not-allowed"
-                          : "border-white/10 text-stone-400 hover:border-amber-400/30 hover:text-amber-400 hover:bg-amber-400/5 cursor-pointer"
+                        ? "border-white/5 bg-white/2 text-stone-700 cursor-not-allowed"
+                        : "border-white/10 text-stone-400 hover:border-amber-400/30 hover:text-amber-400 hover:bg-amber-400/5 cursor-pointer"
                     }`}
                   >
                     {formatTime(slot.startTime)}
@@ -207,7 +207,7 @@ export default function SlotPicker({
         {/* ── Inline confirm card ── */}
         {selectedSlot && (
           <div
-            ref={confirmRef}
+            ref={summaryRef}
             className="bg-[#0f0f11] border border-amber-400/20 rounded-2xl p-6 flex flex-col gap-4"
           >
             <p className="text-xs font-semibold text-stone-500 tracking-widest uppercase">

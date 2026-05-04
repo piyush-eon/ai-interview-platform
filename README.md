@@ -1,4 +1,4 @@
 # Full Stack Interview Platform with Next JS, Supabase, Tailwind, Stream, Arcjet, Shadcn UI Tutorial 🔥🔥
-## Work in Progress
+## https://youtu.be/f0msp-QQUqw
 
-<img width="1470" height="920" alt="Screenshot 2026-03-26 at 2 54 58 PM" src="https://github.com/user-attachments/assets/aa8de81e-158d-49e5-85b2-819be0d74e7b" />
+<img width="1280" height="720" alt="prept (1)" src="https://github.com/user-attachments/assets/f79664d4-7d61-4067-8c7e-938990d54ca9" />

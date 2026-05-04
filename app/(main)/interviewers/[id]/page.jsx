@@ -158,8 +158,8 @@ export default async function InterviewerProfilePage({ params }) {
           </div>
         </div>
 
-        {/* ── RIGHT — Slot Picker ── */}
-        <div className="col-span-2 sticky top-24">
+        {/* ── RIGHT — sticky slot picker ── */}
+        <div className="lg:col-span-2 lg:sticky top-24">
           <SlotPicker
             interviewer={interviewer}
             interviewerCredits={interviewer.creditRate ?? 10}
